@@ -11,6 +11,7 @@ import (
 	"github.com/filecoin-project/go-fil-markets/shared/tokenamount"
 	rtypes "github.com/filecoin-project/go-fil-markets/shared/types"
 	blockstore "github.com/ipfs/go-ipfs-blockstore"
+	xerrors "github.com/pkg/errors"
 )
 
 type RetrievalProviderConnector struct {
@@ -46,13 +47,13 @@ func (r *RetrievalProviderConnector) UnsealSector(ctx context.Context, sectorId 
 func (r *RetrievalProviderConnector) SavePaymentVoucher(_ context.Context, paymentChannel address.Address, voucher *rtypes.SignedVoucher, proof []byte, expectedAmount tokenamount.TokenAmount) (tokenamount.TokenAmount, error) {
 	var tokenamt tokenamount.TokenAmount
 
-	key, err := r.voucherStoreKeyFor(voucher, paymentChannel)
+	key, err := r.voucherStoreKeyFor(voucher)
 	if err != nil {
 		return tokenamt, err
 	}
 	_, ok := r.vs[key]
 	if ok {
-		return tokenamt, err
+		return tokenamt, xerrors.New("voucher exists")
 	}
 	r.vs[key] = voucherEntry{
 		voucher:     voucher,
@@ -62,7 +63,7 @@ func (r *RetrievalProviderConnector) SavePaymentVoucher(_ context.Context, payme
 	return voucher.Amount, nil
 }
 
-func (r *RetrievalProviderConnector) voucherStoreKeyFor(voucher *rtypes.SignedVoucher, pchan address.Address) (string, error) {
+func (r *RetrievalProviderConnector) voucherStoreKeyFor(voucher *rtypes.SignedVoucher) (string, error) {
 	venc, err := voucher.EncodedString()
 	if err != nil {
 		return "", err
