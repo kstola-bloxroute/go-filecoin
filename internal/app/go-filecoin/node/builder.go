@@ -230,6 +230,9 @@ func (b *Builder) build(ctx context.Context) (*Node, error) {
 	}
 
 	panic("provider NewRetrievalProtocolSubmodule the arguments it demands")
+
+	libp2phost := b.libp2pOpts
+
 	nd.RetrievalProtocol, err = submodule.NewRetrievalProtocolSubmodule(address.Undef, nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build node.RetrievalProtocol")
