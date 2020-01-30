@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	a2 "github.com/filecoin-project/go-address"
+	"github.com/filecoin-project/go-fil-markets/piecestore"
 	"github.com/filecoin-project/go-sectorbuilder"
 	bserv "github.com/ipfs/go-blockservice"
 	"github.com/ipfs/go-cid"
@@ -437,6 +438,10 @@ func (node *Node) setupStorageMining(ctx context.Context) error {
 
 	node.StorageMining = &sub
 
+	node.RetrievalProtocol, err = submodule.NewRetrievalProtocolSubmodule(node.Host(), minerAddr2, piecestore.NewPieceStore(node.Repo.Datastore()), node.Blockstore.Blockstore)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
