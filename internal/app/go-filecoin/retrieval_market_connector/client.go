@@ -66,7 +66,7 @@ func NewRetrievalClientNodeConnector(
 		ob, make(map[address.Address]pmtChanEntry), ps, sm, wg }
 }
 
-// GetOrCreatePaymentChannel gets or creates a payment channel
+// GetOrCreatePaymentChannel gets or creates a payment channel and posts to chain
 // Assumes GetOrCreatePaymentChannel is called before AllocateLane
 // Blocks until message is mined?
 func (r *RetrievalClientNodeConnector) GetOrCreatePaymentChannel(ctx context.Context, clientWallet address.Address, minerWallet address.Address, clientFundsAvailable tokenamount.TokenAmount) (address.Address, error) {
@@ -76,28 +76,23 @@ func (r *RetrievalClientNodeConnector) GetOrCreatePaymentChannel(ctx context.Con
 		return address.Undef, err
 	}
 
-	filAmt := types.NewAttoFIL(clientFundsAvailable.Int)
-	if bal.LessThan(filAmt) {
-		return address.Undef, errors.New("not enough funds in wallet")
-	}
-
-	fcClient, err := fcaddr.NewFromBytes(clientWallet.Bytes())
-	if err != nil {
-		return address.Undef, err
-	}
-	fcMiner, err := fcaddr.NewFromBytes(minerWallet.Bytes())
-	if err != nil {
-		return address.Undef, err
-	}
-
-	// minerWorker, err := r.wg(ctx, minerWallet, r.cs.GetHead())
-	// if err != nil {
-	// 	return address.Undef, err
-	// }
-	// fcMinerWorker, err := fcaddr.NewFromBytes(minerWorker.Bytes())
-
 	entry, ok := r.pmtChanReg[clientWallet]
 	if !ok {
+		// create the payment channel
+		filAmt := types.NewAttoFIL(clientFundsAvailable.Int)
+		if bal.LessThan(filAmt) {
+			return address.Undef, errors.New("not enough funds in wallet")
+		}
+
+		fcClient, err := fcaddr.NewFromBytes(clientWallet.Bytes())
+		if err != nil {
+			return address.Undef, err
+		}
+		fcMiner, err := fcaddr.NewFromBytes(minerWallet.Bytes())
+		if err != nil {
+			return address.Undef, err
+		}
+
 		ts, err := r.cs.GetTipSet(r.cs.GetHead())
 		if err != nil {
 			return address.Undef, nil
