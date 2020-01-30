@@ -3,15 +3,12 @@ package porcelain
 import (
 	"context"
 
-	"github.com/filecoin-project/go-filecoin/internal/pkg/block"
 	"github.com/filecoin-project/go-filecoin/internal/pkg/encoding"
 	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-datastore/query"
 	errors "github.com/pkg/errors"
 
 	"github.com/filecoin-project/go-filecoin/internal/pkg/protocol/storage/storagedeal"
-	"github.com/filecoin-project/go-filecoin/internal/pkg/types"
-	"github.com/filecoin-project/go-filecoin/internal/pkg/vm/address"
 )
 
 var (
@@ -85,12 +82,4 @@ func DealsLs(ctx context.Context, plumbing dealLsPlumbing) (<-chan *StorageDealL
 	}()
 
 	return out, nil
-}
-
-type dealRedeemPlumbing interface {
-	ChainHeadKey() block.TipSetKey
-	ChainTipSet(key block.TipSetKey) (block.TipSet, error)
-	DealGet(context.Context, cid.Cid) (*storagedeal.Deal, error)
-	MessagePreview(context.Context, address.Address, address.Address, types.MethodID, ...interface{}) (types.GasUnits, error)
-	MessageSend(context.Context, address.Address, address.Address, types.AttoFIL, types.AttoFIL, types.GasUnits, types.MethodID, ...interface{}) (cid.Cid, chan error, error)
 }
