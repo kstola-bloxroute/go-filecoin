@@ -62,8 +62,6 @@ func init() {
 	StorageMarketActorCodeCid = StorageMarketActorCodeObj.Cid()
 	PowerActorCodeObj = dag.NewRawNode([]byte("power"))
 	PowerActorCodeCid = PowerActorCodeObj.Cid()
-	PaymentBrokerActorCodeObj = dag.NewRawNode([]byte("paymentbroker"))
-	PaymentBrokerActorCodeCid = PaymentBrokerActorCodeObj.Cid()
 	MinerActorCodeObj = dag.NewRawNode([]byte("mineractor"))
 	MinerActorCodeCid = MinerActorCodeObj.Cid()
 	BootstrapMinerActorCodeObj = dag.NewRawNode([]byte("bootstrapmineractor"))
